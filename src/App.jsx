@@ -108,7 +108,13 @@ function App() {
                       tokenDataObjects[i].decimals
                     )}
                   </Box>
-                  <Image src={tokenDataObjects[i].logo} />
+                  <Center>
+                    <Image
+                      borderRadius="full"
+                      boxSize="50px"
+                      src={tokenDataObjects[i].logo}
+                    />
+                  </Center>
                 </Flex>
               );
             })}
