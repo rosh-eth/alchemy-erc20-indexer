@@ -155,10 +155,12 @@ function App() {
                   </Box>
                   <Box>
                     <b>Balance:</b>&nbsp;
-                    {Utils.formatUnits(
-                      e.tokenBalance,
-                      tokenDataObjects[i].decimals
-                    )}
+                    {parseFloat(
+                      Utils.formatUnits(
+                        e.tokenBalance,
+                        tokenDataObjects[i].decimals
+                      )
+                    ).toFixed(2)}
                   </Box>
                   <Center>
                     <Image
