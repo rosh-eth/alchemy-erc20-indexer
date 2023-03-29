@@ -19,7 +19,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [tokenDataObjects, setTokenDataObjects] = useState([]);
 
-  async function main() {
+  async function connect() {
     if (window.ethereum) {
       // Create a new Web3Provider with the injected provider
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -38,7 +38,7 @@ function App() {
       console.log("No web3 provider detected");
     }
   }
-  main();
+  // main();
 
   async function getTokenBalance() {
     try {
@@ -73,6 +73,30 @@ function App() {
   }
   return (
     <Box w="100vw">
+      <Flex
+        w="100%"
+        h="100px"
+        bg="blue"
+        pos="absolute"
+        top="0"
+        color="white"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Heading fontSize={36}>ERC-20 Token Indexer</Heading>
+        <Button
+          fontSize={20}
+          onClick={connect}
+          mt={36}
+          bgColor="blue"
+          ml={36}
+          right="20"
+          top="0"
+          position="absolute"
+        >
+          Connect Wallet
+        </Button>
+      </Flex>
       <Center>
         <Flex
           alignItems={"center"}
