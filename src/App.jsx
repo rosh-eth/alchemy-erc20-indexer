@@ -5,11 +5,11 @@ import {
   Flex,
   Heading,
   Image,
-  Input,
   SimpleGrid,
   Text,
 } from "@chakra-ui/react";
 import { Alchemy, Network, Utils } from "alchemy-sdk";
+import { ethers } from "ethers";
 import { useState } from "react";
 
 function App() {
@@ -19,30 +19,57 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [tokenDataObjects, setTokenDataObjects] = useState([]);
 
-  async function getTokenBalance() {
-    const config = {
-      apiKey: import.meta.env.REACT_APP_ALCHEMY_API_KEY,
-      network: Network.ETH_MAINNET,
-    };
+  async function main() {
+    if (window.ethereum) {
+      // Create a new Web3Provider with the injected provider
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-    const alchemy = new Alchemy(config);
-    const data = await alchemy.core.getTokenBalances(userAddress);
+      // Request access to the user's wallet
+      await window.ethereum.request({ method: "eth_requestAccounts" });
 
-    setResults(data);
-    setIsLoading(true);
+      // Get the signer from the provider, which is used to sign transactions
+      const signer = provider.getSigner();
 
-    const tokenDataPromises = [];
+      // Use the signer to interact with the blockchain
+      setUserAddress(await signer.getAddress());
 
-    for (let i = 0; i < data.tokenBalances.length; i++) {
-      const tokenData = alchemy.core.getTokenMetadata(
-        data.tokenBalances[i].contractAddress
-      );
-      tokenDataPromises.push(tokenData);
+      console.log("userAddress: ", userAddress.toString());
+    } else {
+      console.log("No web3 provider detected");
     }
+  }
+  main();
 
-    setTokenDataObjects(await Promise.all(tokenDataPromises));
-    setHasQueried(true);
-    setIsLoading(false);
+  async function getTokenBalance() {
+    try {
+      const config = {
+        apiKey: import.meta.env.REACT_APP_ALCHEMY_API_KEY,
+        network: Network.ETH_MAINNET,
+      };
+
+      const alchemy = new Alchemy(config);
+      const provider = alchemy.config.getProvider();
+      const data = await alchemy.core.getTokenBalances(userAddress);
+
+      setResults(data);
+      setIsLoading(true);
+
+      const tokenDataPromises = [];
+
+      for (let i = 0; i < data.tokenBalances.length; i++) {
+        const tokenData = alchemy.core.getTokenMetadata(
+          data.tokenBalances[i].contractAddress
+        );
+        tokenDataPromises.push(tokenData);
+      }
+
+      setTokenDataObjects(await Promise.all(tokenDataPromises));
+      setHasQueried(true);
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+    }
   }
   return (
     <Box w="100vw">
@@ -70,7 +97,7 @@ function App() {
         <Heading mt={42}>
           Get all the ERC-20 token balances of this address:
         </Heading>
-        <Input
+        {/* <Input
           onChange={(e) => setUserAddress(e.target.value)}
           color="black"
           w="600px"
@@ -78,7 +105,8 @@ function App() {
           p={4}
           bgColor="white"
           fontSize={24}
-        />
+        /> */}
+        {userAddress ? <Text>{userAddress}</Text> : ""}
 
         {isLoading ? "Loading..." : "Please make a query! "}
         <Button fontSize={20} onClick={getTokenBalance} mt={36} bgColor="blue">
