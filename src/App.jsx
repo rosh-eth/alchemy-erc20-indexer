@@ -16,6 +16,7 @@ function App() {
   const [userAddress, setUserAddress] = useState("");
   const [results, setResults] = useState([]);
   const [hasQueried, setHasQueried] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [tokenDataObjects, setTokenDataObjects] = useState([]);
 
   async function getTokenBalance() {
@@ -28,6 +29,7 @@ function App() {
     const data = await alchemy.core.getTokenBalances(userAddress);
 
     setResults(data);
+    setIsLoading(true);
 
     const tokenDataPromises = [];
 
@@ -40,6 +42,7 @@ function App() {
 
     setTokenDataObjects(await Promise.all(tokenDataPromises));
     setHasQueried(true);
+    setIsLoading(false);
   }
   return (
     <Box w="100vw">
@@ -76,6 +79,8 @@ function App() {
           bgColor="white"
           fontSize={24}
         />
+
+        {isLoading ? "Loading..." : "Please make a query! "}
         <Button fontSize={20} onClick={getTokenBalance} mt={36} bgColor="blue">
           Check ERC-20 Token Balances
         </Button>
@@ -109,7 +114,7 @@ function App() {
             })}
           </SimpleGrid>
         ) : (
-          "Please make a query! This may take a few seconds..."
+          ""
         )}
       </Flex>
     </Box>
